@@ -155,6 +155,18 @@ function setup() {
   slider.position(20, 55);  
   */
   
+  speedChange = createElement('h2', 'Speed');
+  speedChange.style('color', 'white');
+  speedChange.style('font-family', 'sans-serif')
+  speedChange.style('font-size', '20px')
+  speedChange.position(80, 27);
+  delSpeed = createButton('-');
+  delSpeed.position(20, 45);
+  delSpeed.mousePressed(functionThatSlows);
+  addSpeed = createButton('+');
+  addSpeed.position(45, 45);
+  addSpeed.mousePressed(functionThatSpeedsUp);
+  
   enableColor = createElement('h2', 'Toggle Color');
   enableColor.style('color', 'white');
   enableColor.style('font-family', 'sans-serif')
@@ -224,10 +236,12 @@ function draw() {
     p.moveParticle();
   }
   updateParticleCounter();
+  checkIfPaused();
 }
 
 function createDefaultParticles() {
   particles = [];
+  paused = false
   for(let i = 0;i<numOfParticles;i++){
     particles.push(new Particle(colored,seeded,1,8,currentSeed));
   }
@@ -248,13 +262,37 @@ function createColoredParticles() {
   }
 }
 
+function checkIfPaused() {
+  if (paused) {
+    pauseButton.html('RESUME');
+  } else {
+    pauseButton.html('PAUSE');
+  }
+}
+
+xSpeedArray = [];
+ySpeedArray = [];
+
 function pauseResume() {
   if (!paused) {
-    changeSpeed(0);
+    // changeSpeed(0);
+    for (let i=0;i<particles.length;i++) {
+      p = particles[i];
+      xSpeedArray.push(p.xSpeed);
+      xSpeedArray.push(p.ySpeed);
+      p.xSpeed = 0;
+      p.ySpeed = 0;
+    }
     paused = true;
     pauseButton.html('RESUME');
   } else {
-    changeSpeed(1);
+    //changeSpeed(1);
+    for (let i=0;i<particles.length;i++) {
+      p = particles[i];
+      p.xSpeed = xSpeedArray[i];
+      p.ySpeed = xSpeedArray[i];
+      p.moveParticle()
+    }
     paused = false;
     pauseButton.html('PAUSE');
   }
@@ -286,7 +324,53 @@ function functionThatAppliesOrRemovesColor() {
 
 function functionThatTogglesSeed() {
   currentSeed = Math.floor(Math.random() * numAvailableSeeds)
+  paused = false
   createSeededParticles();
+}
+
+function functionThatSlows() {
+  for(let i = 0;i<particles.length;i++) {
+    p = particles[i];
+    if (p.xSpeed == 0 && p.ySpeed == 0) {
+      continue;
+    } else {
+      if (p.xSpeed == 0) {
+      
+      } else {
+        if (p.xSpeed<0) {
+          p.xSpeed++;
+        } else if (p.xSpeed>0) {
+          p.xSpeed--;
+        } 
+      }
+    if (p.ySpeed == 0) {
+      
+    } else {
+      if (p.ySpeed<0) {
+        p.xSpeed++;
+      } else if (p.ySpeed>0) {
+        p.xSpeed--;
+      } 
+    }
+    }
+  }
+}
+
+function functionThatSpeedsUp() {
+  for(let i = 0;i<particles.length;i++) {
+    p = particles[i];
+    // p.setRandomSpeed();
+    if (p.xSpeed<0) {
+      p.xSpeed -= 1;
+    } else if (p.xSpeed>0) {
+      p.xSpeed += 1;
+    } 
+    if (p.ySpeed<0) {
+      p.ySpeed -= 1;
+    } else if (p.ySpeed>0) {
+      p.ySpeed += 1;
+    }
+  }
 }
 
 function functionThatAdds10Particles() {
